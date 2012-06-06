@@ -1,0 +1,8 @@
+{application, etest, [
+    {description, "A small Erlang testing framework"},
+    {vsn, git},
+    {registered, []},
+    {modules, []},
+    {applications, []},
+    {env, []}
+]}.

@@ -1,0 +1,9 @@
+#!/usr/bin/env escript
+%%! -pa ebin
+
+main(Filenames) ->
+    ToModuleNames = fun(Filename) ->
+        list_to_atom(filename:basename(Filename, ".erl"))
+    end,
+    Testmodules = lists:map(ToModuleNames, Filenames),
+    lists:foreach(fun et_runner:run/1, Testmodules).
