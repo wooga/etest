@@ -3,8 +3,8 @@
 
 
 run_all(Modules) ->
-    ModuleAtoms = lists:map(fun erlang:list_to_atom/1, Modules),
-    lists:foreach(fun run/1, ModuleAtoms).
+    lists:foreach(fun run/1, Modules),
+    erlang:halt().
 
 
 run(Module) ->
