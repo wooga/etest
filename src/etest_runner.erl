@@ -1,4 +1,4 @@
--module (et_runner).
+-module (etest_runner).
 -compile (export_all).
 
 
