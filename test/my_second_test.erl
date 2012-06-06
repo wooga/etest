@@ -1,6 +1,6 @@
 -module(my_second_test).
-
 -compile(export_all).
+-include ("etest.hrl").
 
 test_foo() ->
-    1 = 4.
+    ?assert_equal(true, false).

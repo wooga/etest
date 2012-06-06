@@ -1,16 +1,12 @@
 #!/bin/sh
 
 test_files=`find . -name "*.erl" | grep "_test.erl"`
-modules=""
 
+modules=""
 for i in $test_files
 do
-
   foo=`basename "$i" .erl`
   modules="$foo $modules"
-
 done
-
-echo $modules
 
 erl -noshell -noinput -pa deps/*/ebin ebin -s etest_runner run_all $modules

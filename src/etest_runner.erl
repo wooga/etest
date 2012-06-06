@@ -4,6 +4,13 @@
 
 run_all(Modules) ->
     lists:foreach(fun run/1, Modules),
+
+    io:format("=========================================~n"
+              "  Failed: ~p.  Success: ~p.  Total: ~p.~n~n", [
+                get(errors),
+                get(success),
+                get(tests) ]),
+
     erlang:halt().
 
 
@@ -20,8 +27,9 @@ run(Module) ->
             Test()
         catch
             _:Error ->
-                io:format("~p~n", [Error]),
-                io:format("::~p~n", [erlang:get_stacktrace()])
+                inc(errors),
+                io:format("::~p~n", [Error]),
+                io:format("Stacktrace:~n~p~n~n", [erlang:get_stacktrace()])
         end
     end,
     lists:foreach(TryTest, ToRun).
@@ -37,7 +45,11 @@ testfuns(Module) ->
     TestFuns = lists:filter(IsTest, Exports),
 
     MakeApplicative = fun({FunName, _}) ->
-        fun() -> Module:FunName() end
+        fun() ->
+            inc(tests),
+            Module:FunName(),
+            inc(success)
+        end
     end,
     lists:map(MakeApplicative, TestFuns).
 
@@ -58,3 +70,11 @@ maybe_fun(Module, FunName) ->
 has_fun(Module, FunName) ->
     Exports = Module:module_info(exports),
     proplists:is_defined(FunName, Exports).
+
+
+inc(Name) ->
+    OldVal = case get(Name) of
+        undefined -> 0;
+        Val -> Val
+    end,
+    put(Name, OldVal + 1).
