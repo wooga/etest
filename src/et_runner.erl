@@ -2,6 +2,11 @@
 -compile (export_all).
 
 
+run_all(Modules) ->
+    ModuleAtoms = lists:map(fun erlang:list_to_atom/1, Modules),
+    lists:foreach(fun run/1, ModuleAtoms).
+
+
 run(Module) ->
     Funs = testfuns(Module),
     FunsWithCallbacks = apply_callbacks(Module, Funs),
