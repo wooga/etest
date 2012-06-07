@@ -2,10 +2,17 @@
 -compile (export_all).
 
 
+% Macro printing the given message to stderr.
+-define (stderr (Msg, Args),
+    io:put_chars(standard_error, io_lib:format(Msg, Args))).
+
+-define (stderr (Msg), ?stderr(Msg, [])).
+
+
 % The runner will be called without arguments in case no tests were found .
 % Print a descriptive error message, then exit.
 run_all() ->
-    io:put_chars(standard_error, "etest: No tests found"),
+    ?stderr("etest: No tests found~n"),
     erlang:halt().
 
 
@@ -21,7 +28,7 @@ run_all(Modules) ->
                 get(success),
                 get(tests) ]),
 
-    erlang:halt().
+    erlang:halt(get(errors)).
 
 
 run(Module) ->
@@ -47,7 +54,13 @@ run(Module) ->
 
 
 testfuns(Module) ->
-    Exports = Module:module_info(exports),
+    Exports = try
+        Module:module_info(exports)
+    catch
+        _:_ ->
+            ?stderr("etest: ~p: No such module~n", [Module]),
+            erlang:halt(1)
+    end,
 
     IsTest = fun({FunName, _}) ->
         nomatch =/= re:run(atom_to_list(FunName), "^test_")
