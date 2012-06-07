@@ -2,8 +2,18 @@
 -compile (export_all).
 
 
+% The runner will be called without arguments in case no tests were found .
+% Print a descriptive error message, then exit.
+run_all() ->
+    io:put_chars(standard_error, "etest: No tests found"),
+    erlang:halt().
+
+
 run_all(Modules) ->
     lists:foreach(fun run/1, Modules),
+
+    % Init statistics.
+    [inc(K) || K <- [errors, success, tests]],
 
     io:format("=========================================~n"
               "  Failed: ~p.  Success: ~p.  Total: ~p.~n~n", [
