@@ -50,10 +50,10 @@ after_suite() ->
 
 ## Available Assertions
 
-* ?assert/1 (expects term that evaluates to true or false)
-* ?assert_equal/2 and assert_not_equal/2
-* ?assert_matche/2 and assert_no_match/2
-* ?assert_throw/1 and assert_nothing_thrown/1 (expects a fun)
+* ```?assert/1``` (expects term that evaluates to true or false)
+* ```?assert_equal/2``` and ```assert_not_equal/2```
+* ```?assert_matche/2``` and ```assert_no_match/2```
+* ```?assert_throw/1``` and ```assert_nothing_thrown/1``` (expects a fun)
 
 ## Installation
 
