@@ -52,7 +52,7 @@ after_suite() ->
 
 * ```?assert/1``` (expects term that evaluates to true or false)
 * ```?assert_equal/2``` and ```assert_not_equal/2```
-* ```?assert_matche/2``` and ```assert_no_match/2```
+* ```?assert_match/2``` and ```assert_no_match/2```
 * ```?assert_throw/1``` and ```assert_nothing_thrown/1``` (expects a fun)
 
 ## Installation
@@ -68,3 +68,15 @@ dependency:
 ```
 
 Then run `rebar get-deps` to sync your dependencies.
+
+## Running the Tests
+
+Run ```deps/etest/bin/etest-runner``` from the top-level directory and all the
+tests in the test directory will be executed.
+
+Run ```deps/etest/bin/etest-runner test/integration/user_login_test.erl``` to
+execute only a single test file
+
+
+
+
