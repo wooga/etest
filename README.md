@@ -18,21 +18,16 @@ the rest of the test case will be skipped and the next one is executed.
 ## Example Test Case
 
 ```erlang
--module( my_first_test ).
+-module(my_first_test).
 -compile(export_all).
 -include(etest.hrl).
 
-% The order of callback definition does *not* matter!
-
 before_suite() ->
-    % load sql schema and start my app
     setup_database(),
     application:start(myapp).
 
 before_test() ->
-    % before each test create dummy user
     myapp_users:create_dummy_user().
-
 
 test_application_has_one_user() ->
     ?assert_equal(1, length( myapp_users:all() )).
@@ -40,19 +35,16 @@ test_application_has_one_user() ->
 test_creating_a_new_user() ->
     Old = myapp_users:first(),
     New = myapp_users:create(
-        [{name, "Peter"}, {favorite_test_framework, "etest"}
-    ),
+        [{name, "Peter"}, {favorite_test_framework, "etest"}),
 
     ?assert_equal(2, length( myapp_users:all() )),
     ?assert_not_equal(Old, New),
     ?assert_equal(New, myapp_users:last()).
 
 after_test() ->
-    % after each test truncate users table
     myapp_users:delete_all(),
 
 after_suite() ->
-    % stop application
     application:stop(myapp).
 ```
 
