@@ -20,7 +20,7 @@ the rest of the test case will be skipped and the next one is executed.
 ```erlang
 -module(my_first_test).
 -compile(export_all).
--include(etest.hrl).
+-include_lib("etest/include/etest.hrl").
 
 before_suite() ->
     setup_database(),
