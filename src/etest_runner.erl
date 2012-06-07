@@ -46,7 +46,8 @@ run(Module) ->
             _:Error ->
                 inc(errors),
                 io:format("::~p~n", [Error]),
-                io:format("Stacktrace:~n~p~n~n", [erlang:get_stacktrace()])
+                CleanTrace = clean_trace(erlang:get_stacktrace()),
+                io:format("Stacktrace:~n~p~n~n", [CleanTrace])
         end
     end,
     lists:foreach(TryTest, ToRun).
@@ -93,6 +94,12 @@ maybe_fun(Module, FunName) ->
 has_fun(Module, FunName) ->
     Exports = Module:module_info(exports),
     proplists:is_defined(FunName, Exports).
+
+
+clean_trace(Trace0) ->
+    % Remove the lower etest stack.
+    {_ETestTrace, TraceR} = lists:split(5, lists:reverse(Trace0)),
+    lists:reverse(TraceR).
 
 
 inc(Name) ->
