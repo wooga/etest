@@ -10,10 +10,10 @@ run_all() ->
 
 
 run_all(Modules) ->
-    lists:foreach(fun run/1, Modules),
-
     % Init statistics.
-    [inc(K) || K <- [errors, success, tests]],
+    [put(K, 0) || K <- [errors, success, tests]],
+
+    lists:foreach(fun run/1, Modules),
 
     io:format("=========================================~n"
               "  Failed: ~p.  Success: ~p.  Total: ~p.~n~n", [
@@ -83,8 +83,4 @@ has_fun(Module, FunName) ->
 
 
 inc(Name) ->
-    OldVal = case get(Name) of
-        undefined -> 0;
-        Val -> Val
-    end,
-    put(Name, OldVal + 1).
+    put(Name, get(Name) + 1).
