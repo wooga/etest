@@ -2,16 +2,16 @@
 
 ETest is a lightweight test framework for Erlang.
 
-It empbraces convention over configuration and tries hard to do only one
+It embraces convention over configuration and tries hard to do only one
 thing: run your tests.
 
 * ETest expects an erlang application / rebar compatible directory structure
-to work with the following top level directories: src, deps, ebin, test
+with the following top level directories: src, deps, ebin, test
 * Test files should have a \_test.erl ending and test functions should start
 with a test\_ prefix
 * Each test file can implement some or all of the following callbacks:
 before\_suite, before\_test, after\_test and after\_suite which will behave as
-the name suggests.
+the names suggests.
 * There are no test generators like in eunit. If one of many assertions fails,
 the rest of the test case will be skipped and the next one is executed.
 
@@ -54,7 +54,7 @@ after_test() ->
 after_suite() ->
     % stop application
     application:stop(myapp).
-
+```
 
 ## Installation
 
