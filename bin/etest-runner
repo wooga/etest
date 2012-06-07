@@ -1,7 +1,12 @@
 #!/bin/sh
 
-test_files=`find test -name "*.erl" | grep "_test.erl"`
+# Either test the specified or all files.
+if [[ $# == 0 ]]
+    then test_files=`find test -name "*.erl" | grep "_test.erl"`;
+    else test_files=$@;
+fi
 
+# Map test files to modules names.
 modules=""
 for file in $test_files
 do
@@ -9,4 +14,5 @@ do
   modules="$modulename $modules"
 done
 
+# Invoke runner, assuming all files have been compiled to `ebin/`.
 erl -noshell -noinput -pa deps/*/ebin ebin -s etest_runner run_all $modules
