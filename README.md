@@ -5,21 +5,24 @@ ETest is a lightweight test framework for Erlang.
 It embraces convention over configuration and tries hard to do only one
 thing: run your tests.
 
-* ETest expects an erlang application / rebar compatible directory structure
-with the following top level directories: src, deps, ebin, test
-* Test files should have a \_test.erl ending and test functions should start
-with a test\_ prefix
+* ETest expects an Erlang application / rebar compatible directory structure
+with the following top level directories: _src_, _deps_, _ebin_ and _test_
+* Test files should have a `_test.erl` ending and test cases should start
+with a `test_` prefix
 * Each test file can implement some or all of the following callbacks:
-before\_suite, before\_test, after\_test and after\_suite which will behave as
-the names suggests.
-* There are no test generators like in eunit. If one of many assertions fails,
-the rest of the test case will be skipped and the next one is executed.
+  * `before_suite` - Invoked once before all cases,
+  * `before_test` - Invoked before each case,
+  * `after_test` - Invoked after each case,
+  * `after_suite` - Invoked once after all cases, independent of case failure,
+* There are no test generators like in EUnit. If an assertion in a test case fails, the rest of the case will be skipped and etest continues executing the remaining cases.
 
 ## Example Test Case
 
 ```erlang
 -module(my_first_test).
 -compile(export_all).
+
+# Include etest's assertion macros.
 -include_lib("etest/include/etest.hrl").
 
 before_suite() ->
@@ -71,12 +74,8 @@ Then run `rebar get-deps` to sync your dependencies.
 
 ## Running the Tests
 
-Run ```deps/etest/bin/etest-runner``` from the top-level directory and all the
-tests in the test directory will be executed.
+In your project directory, run ```deps/etest/bin/etest-runner``` to execute all
+tests in the `test` directory.
 
 Run ```deps/etest/bin/etest-runner test/integration/user_login_test.erl``` to
-execute only a single test file
-
-
-
-
+execute a single test file.
