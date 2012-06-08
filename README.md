@@ -1,6 +1,6 @@
 # etest
 
-It is a lightweight test framework for Erlang which can be used for unit, 
+It is a lightweight test framework for Erlang which can be used for unit,
 functional and to some degree also integration testing. If you need more complex
 test setups please consider common test.
 
@@ -16,8 +16,8 @@ with a `test_` prefix
   * `before_test` - Invoked before each case,
   * `after_test` - Invoked after each case,
   * `after_suite` - Invoked once after all cases, independent of case failure,
-* There are no test generators like in EUnit. If an assertion in a test case 
-fails, the rest of the case will be skipped and etest continues executing the 
+* There are no test generators like in EUnit. If an assertion in a test case
+fails, the rest of the case will be skipped and etest continues executing the
 remaining cases.
 
 ## Example Test Case
@@ -57,10 +57,23 @@ after_suite() ->
 
 ## Available Assertions
 
-* ```?assert/1``` (expects term that evaluates to true or false)
-* ```?assert_equal/2``` and ```assert_not_equal/2```
-* ```?assert_match/2``` and ```assert_no_match/2```
-* ```?assert_throw/1``` and ```assert_nothing_thrown/1``` (expects a fun)
+* ```?assert(Expression)```
+* ```?assert_equal(Expected, Actual)```
+* ```?assert_match(Expected, Actual)```
+* ```?assert_exception(Class, Pattern, Expression)```
+* ```?assert_error(Pattern, Expression)```
+* ```?assert_exit(Pattern, Expression)```
+* ```?assert_throw(Pattern, Expression)```
+
+### Negations
+
+* ```?assert_not(Expression)```
+* ```?assert_not_equal(Unexpected, Actual)```
+* ```?assert_no_match(Unexpected, Actual)```
+* ```?assert_no_exception(Class, Pattern, Expression)```
+* ```?assert_no_error(Pattern, Expression)```
+* ```?assert_no_exit(Pattern, Expression)```
+* ```?assert_no_throw(Pattern, Expression)```
 
 ## Installation
 

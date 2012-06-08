@@ -61,7 +61,7 @@
   end)()) ).
 
 
--define(assert_not_match(Guard, Expr),
+-define(assert_no_match(Guard, Expr),
 ((fun () ->
     __V = (Expr),
     case __V of
@@ -106,7 +106,7 @@
 -define(assert_throw(Term, Expr), ?assert_exception(throw, Term, Expr)).
 
 
--define(assert_not_exception(Class, Term, Expr),
+-define(assert_no_exception(Class, Term, Expr),
 ((fun () ->
     try (Expr) of
         _ -> ok
@@ -132,8 +132,8 @@
   end)()) ).
 
 
--define(assert_not_error(Term, Expr), ?assert_not_exception(error, Term, Expr)).
--define(assert_not_exit(Term, Expr),  ?assert_not_exception(exit, Term, Expr)).
--define(assert_not_throw(Term, Expr), ?assert_not_exception(throw, Term, Expr)).
+-define(assert_no_error(Term, Expr), ?assert_no_exception(error, Term, Expr)).
+-define(assert_no_exit(Term, Expr),  ?assert_no_exception(exit, Term, Expr)).
+-define(assert_no_throw(Term, Expr), ?assert_no_exception(throw, Term, Expr)).
 
 -endif. % ETEST_HRL.
