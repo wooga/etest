@@ -22,7 +22,7 @@ with a `test_` prefix
 -module(my_first_test).
 -compile(export_all).
 
-# Include etest's assertion macros.
+% Include etest's assertion macros.
 -include_lib("etest/include/etest.hrl").
 
 before_suite() ->
