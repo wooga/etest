@@ -77,19 +77,36 @@ after_suite() ->
 
 ## Installation
 
-Install etest by adding it as a [rebar](https://github.com/basho/rebar)
-dependency:
+To install etest add it as a dependency to your rebar.config and also add
+the test directory to the ```src_dirs``` option. This will compile the
+tests whenever ```rebar compile``` is executed and you don't have to compile
+the tests manuall.
+
+### Example rebar.config
 
 ```erlang
-% In your rebar.config:
+% Compiler Options for rebar
+{erl_opts, [
+    {src_dirs, ["src", "test"]}
+]}.
+
+% Dependencies
 {deps, [
     {etest, ".*", {git, "git://github.com/wooga/etest.git"}}
 ]}.
+
+% Which files to cleanup when rebar clean is executed.
+{clean_files, ["ebin/*.beam"]}.
 ```
 
-Then run `rebar get-deps` to sync your dependencies.
+After updating your rebar.config, run ```rebar get-deps``` to install etest.
+
 
 ## Running the Tests
+
+Before running the tests, they need to be compiled by running
+```rebar compile```. You can write a simple shell script that compiles
+everything before running the tests to make your life easier.
 
 In your project directory, run ```deps/etest/bin/etest-runner``` to execute all
 tests in the `test` directory.
