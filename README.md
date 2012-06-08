@@ -1,13 +1,9 @@
 # etest
 
-It is a lightweight test framework for Erlang which can be used for unit,
-functional and to some degree also integration testing. If you need more complex
-test setups please consider common test.
+It is a lightweight, opinionated, convention over configuration test framework for
+Erlang.
 
-It embraces convention over configuration and tries hard to do only one
-thing: run your tests.
-
-* ETest expects an Erlang application / rebar compatible directory structure
+* etest expects an Erlang application / rebar compatible directory structure
 with the following top level directories: _src_, _deps_, _ebin_ and _test_
 * Test files should have a `_test.erl` ending and test cases should start
 with a `test_` prefix
@@ -42,7 +38,7 @@ test_application_has_one_user() ->
 test_creating_a_new_user() ->
     Old = myapp_users:first(),
     New = myapp_users:create(
-        [{name, "Peter"}, {favorite_test_framework, "etest"}),
+        [{name, "Peter"}, {favorite_test_framework, "etest"}]),
 
     ?assert_equal(2, length( myapp_users:all() )),
     ?assert_not_equal(Old, New),
@@ -74,6 +70,12 @@ after_suite() ->
 * ```?assert_no_error(Pattern, Expression)```
 * ```?assert_no_exit(Pattern, Expression)```
 * ```?assert_no_throw(Pattern, Expression)```
+
+## Fixtures
+
+etest has no concept of fixtures like eunit. If you need some
+data over and over inside of your tests, you can define macros or
+functions instead and call them from within your tests.
 
 ## Demo
 
