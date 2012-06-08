@@ -1,6 +1,8 @@
-## etest
+# etest
 
-ETest is a lightweight test framework for Erlang.
+It is a lightweight test framework for Erlang which can be used for unit, 
+functional and to some degree also integration testing. If you need more complex
+test setups please consider common test.
 
 It embraces convention over configuration and tries hard to do only one
 thing: run your tests.
@@ -14,7 +16,9 @@ with a `test_` prefix
   * `before_test` - Invoked before each case,
   * `after_test` - Invoked after each case,
   * `after_suite` - Invoked once after all cases, independent of case failure,
-* There are no test generators like in EUnit. If an assertion in a test case fails, the rest of the case will be skipped and etest continues executing the remaining cases.
+* There are no test generators like in EUnit. If an assertion in a test case 
+fails, the rest of the case will be skipped and etest continues executing the 
+remaining cases.
 
 ## Example Test Case
 
