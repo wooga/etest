@@ -75,6 +75,11 @@ after_suite() ->
 * ```?assert_no_exit(Pattern, Expression)```
 * ```?assert_no_throw(Pattern, Expression)```
 
+## Demo
+
+There is a quick screencast on vimeo that shows how to use etest in your
+project: [https://vimeo.com/43672318](https://vimeo.com/43672318)
+
 ## Installation
 
 To install etest add it as a dependency to your rebar.config and also add
