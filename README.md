@@ -1,6 +1,6 @@
 # etest
 
-It is a lightweight, opinionated, convention over configuration test framework for
+It is a lightweight, convention over configuration test framework for
 Erlang.
 
 * etest expects an Erlang application / rebar compatible directory structure
