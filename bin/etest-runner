@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 
 # Either test the specified or all files.
-if [[ $# == 0 ]]
+if [ $# -eq 0 ]
     then test_files=`find test -name "*.erl" | grep "_test.erl"`;
     else test_files=$@;
 fi
