@@ -63,10 +63,18 @@ testfuns(Module) ->
             erlang:halt(1)
     end,
 
-    IsTest = fun({FunName, _}) ->
-        nomatch =/= re:run(atom_to_list(FunName), "^test_")
+    IsFocus = fun({FunName, _}) ->
+        nomatch =/= re:run(atom_to_list(FunName), "^focustest_")
     end,
-    TestFuns = lists:filter(IsTest, Exports),
+
+    TestFuns = case lists:filter(IsFocus, Exports) of
+        [] ->
+            IsTest = fun({FunName, _}) ->
+                nomatch =/= re:run(atom_to_list(FunName), "^test_")
+            end,
+            lists:filter(IsTest, Exports);
+        FocusTests -> FocusTests
+    end,
 
     MakeApplicative = fun({FunName, _}) ->
         fun() ->
@@ -81,7 +89,13 @@ testfuns(Module) ->
 apply_callbacks(Module, Funs) ->
     Before = maybe_fun(Module, before_test),
     After = maybe_fun(Module, after_test),
-    [[Before, Fun, After] || Fun <- Funs].
+    [
+        fun() ->
+            Before(),
+            try Fun() after After() end
+        end
+        || Fun <- Funs
+    ].
 
 
 maybe_fun(Module, FunName) ->
