@@ -77,6 +77,32 @@ etest has no concept of fixtures like eunit. If you need some
 data over and over inside of your tests, you can define macros or
 functions instead and call them from within your tests.
 
+
+## Focus Tests
+
+From time to time you might want to run a single test case out of your suite to quickly pin down where the underlying program fails. Thus we introduced the concept of _Focus Tests_, where you would _mark_ one or more test cases with the prefix `focus_`, then upon running your tests only the marked cases will be executed.
+
+Example:
+
+```erlang
+-module(my_focus_test).
+-compile(export_all).
+
+% Include etest's assertion macros.
+-include_lib("etest/include/etest.hrl").
+
+% This case will be ignored.
+test_bar() ->
+    % ...
+    ?assert_equal(false, true).
+
+% This case will be run.
+focus_test_foo() ->
+    % ...
+    ?assert(true).
+```
+
+
 ## Demo
 
 There is a quick screencast on vimeo that shows how to use etest in your

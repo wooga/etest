@@ -64,7 +64,7 @@ testfuns(Module) ->
     end,
 
     IsFocus = fun({FunName, _}) ->
-        nomatch =/= re:run(atom_to_list(FunName), "^focustest_")
+        nomatch =/= re:run(atom_to_list(FunName), "^focus_test_")
     end,
 
     TestFuns = case lists:filter(IsFocus, Exports) of
