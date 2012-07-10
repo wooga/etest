@@ -18,6 +18,19 @@
   end)()) ).
 
 
+-define(assert_not(Expr),
+((fun () ->
+    case (Expr) of
+    false -> ok;
+    __V  -> .erlang:error({assert,
+                [{module,     ?MODULE},
+                 {line,       ?LINE},
+                 {expression, (??Expr)},
+                 {expected,   false},
+                 {value,      __V}] })
+    end
+  end)()) ).
+
 
 -define(assert_equal(Expected, Expr),
 ((fun (__X) ->
