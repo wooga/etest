@@ -3,4 +3,5 @@
 -compile(export_all).
 
 test_foo() ->
-    1 = 2.
+    A = 1,
+    A = 2.
