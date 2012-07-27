@@ -1,5 +1,37 @@
 #!/bin/sh
 
+usage() {
+    cat <<EOF
+USAGE: `basename $0` [OPTIONS] [TESTS]
+
+Run the given TESTS modules, optionally by specific group only.
+
+OPTIONS:
+ -h          Show this message
+ -g [GROUP]  Run the tests of the specified group.
+EOF
+}
+
+group=
+while getopts "hg:" option
+do
+     case $option in
+         h)
+             usage
+             exit 1
+             ;;
+         g)
+             group=$OPTARG
+             ;;
+         ?)
+             usage
+             exit
+             ;;
+     esac
+done
+
+shift $(($OPTIND-1))
+
 # Either test the specified or all files.
 if [ $# -eq 0 ]
     then test_files=`find apps test -type f -name '*_test.erl' 2>/dev/null`;
@@ -15,4 +47,12 @@ do
 done
 
 # Invoke runner, assuming all files have been compiled to `ebin/`.
-erl -noshell -noinput -pa deps/*/ebin apps/*/ebin ebin -s etest_runner run_all $modules
+CMD="erl -noshell -noinput -pa deps/*/ebin apps/*/ebin ebin\
+     -s etest_runner run_all $modules"
+
+if [ -n $group ]
+then
+    CMD="$CMD -group $group"
+fi
+
+exec $CMD

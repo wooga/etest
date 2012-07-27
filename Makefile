@@ -8,7 +8,7 @@ compile:
 clean:
 	$(REBAR) clean
 
-test:
+test: compile
 	./bin/etest-runner
 
 .PHONY: all compile clean test
