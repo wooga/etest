@@ -1,4 +1,4 @@
-# test
+# etest
 
 It is a lightweight, convention over configuration test framework for
 Erlang.
