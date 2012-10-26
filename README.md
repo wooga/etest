@@ -146,3 +146,8 @@ tests in the `test` directory.
 
 Run ```deps/etest/bin/etest-runner test/integration/user_login_test.erl``` to
 execute a single test file.
+
+To pass additional arguments to the `erl` command you can use the
+environmant variable `ERL_AFLAGS`. E.g
+
+```ERL_AFLAGS="-config priv/config/test.config" deps/etest/bin/etest-runner``` 
