@@ -8,7 +8,7 @@
 ((fun () ->
     case (Expr) of
     true -> ok;
-    __V  -> .erlang:error({assert,
+    __V  -> erlang:error({assert,
                 [{module,     ?MODULE},
                  {line,       ?LINE},
                  {expression, (??Expr)},
@@ -22,7 +22,7 @@
 ((fun () ->
     case (Expr) of
     false -> ok;
-    __V  -> .erlang:error({assert,
+    __V  -> erlang:error({assert,
                 [{module,     ?MODULE},
                  {line,       ?LINE},
                  {expression, (??Expr)},
@@ -36,7 +36,7 @@
 ((fun (__X) ->
     case (Expr) of
     __X -> ok;
-    __V -> .erlang:error({assert_equal,
+    __V -> erlang:error({assert_equal,
                 [{module,     ?MODULE},
                  {line,       ?LINE},
                  {expression, (??Expr)},
@@ -49,7 +49,7 @@
 -define(assert_not_equal(Unexpected, Expr),
 ((fun (__X) ->
     case (Expr) of
-    __X -> .erlang:error({assert_not_equal,
+    __X -> erlang:error({assert_not_equal,
                 [{module,     ?MODULE},
                  {line,       ?LINE},
                  {expression, (??Expr)},
@@ -64,7 +64,7 @@
 ((fun () ->
     case (Expr) of
     Guard -> ok;
-    __V -> .erlang:error({assert_match,
+    __V -> erlang:error({assert_match,
                 [{module,     ?MODULE},
                  {line,       ?LINE},
                  {expression, (??Expr)},
@@ -78,7 +78,7 @@
 ((fun () ->
     __V = (Expr),
     case __V of
-    Guard -> .erlang:error({assert_not_match,
+    Guard -> erlang:error({assert_not_match,
                 [{module,     ?MODULE},
                  {line,       ?LINE},
                  {expression, (??Expr)},
@@ -93,7 +93,7 @@
 -define(assert_exception(Class, Term, Expr),
 ((fun () ->
     try (Expr) of
-        __V -> .erlang:error({assert_exception,
+        __V -> erlang:error({assert_exception,
                     [{module,     ?MODULE},
                      {line,       ?LINE},
                      {expression, (??Expr)},
@@ -103,13 +103,13 @@
     catch
     Class:Term -> ok;
         __C:__T ->
-        .erlang:error({assert_exception,
+        erlang:error({assert_exception,
             [{module,     ?MODULE},
              {line,       ?LINE},
              {expression, (??Expr)},
              {pattern,    "{" ++ (??Class) ++ ", " ++ (??Term) ++ ", [...]}"},
              {unexpected_exception,
-                {__C, __T, .erlang:get_stacktrace()}}] })
+                {__C, __T, erlang:get_stacktrace()}}] })
     end
   end)()) ).
 
@@ -129,14 +129,14 @@
         Class ->
             case __T of
             Term ->
-                .erlang:error({assert_not_exception,
+                erlang:error({assert_not_exception,
                     [{module,     ?MODULE},
                      {line,       ?LINE},
                      {expression, (??Expr)},
                      {pattern,
                         "{" ++ (??Class) ++ ", " ++ (??Term) ++ ", [...]}"},
                      {unexpected_exception,
-                         {__C, __T, .erlang:get_stacktrace()}}] });
+                         {__C, __T, erlang:get_stacktrace()}}] });
             _ -> ok
             end;
         _ -> ok
