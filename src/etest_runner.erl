@@ -41,9 +41,11 @@ run(Module) ->
     ToRun = lists:flatten([BeforeSuite, FunsWithCallbacks, AfterSuite]),
     TryTest = fun (Test) ->
         try
-            Test()
+            Test(),
+            io:format("Etest passed.\n")
         catch
             _:Error ->
+                io:format("Etest failed.\n"),
                 inc(errors),
                 io:format("::~p~n", [Error]),
                 CleanTrace = clean_trace(erlang:get_stacktrace()),
@@ -79,6 +81,11 @@ testfuns(Module) ->
     MakeApplicative = fun({FunName, _}) ->
         fun() ->
             inc(tests),
+            Msg = lists:flatten(io_lib:format("~p:~p ", [Module, FunName])),
+            io:format(
+                string:left(Msg, 80, $.) ++ "\n" ++
+                string:left("",  80, $=) ++ "\n"
+            ),
             Module:FunName(),
             inc(success)
         end
