@@ -1,12 +1,14 @@
 # etest
 
-It is a lightweight, convention over configuration test framework for
+etest is a lightweight, convention-over-configuration test framework for
 Erlang.
 
-* etest expects an Erlang application / rebar compatible directory structure
-with the following top level directories: _src_, _deps_, _ebin_ and _test_
-* Test files should have a `_test.erl` ending and test cases should start
-with a `test_` prefix
+* etest expects an Erlang application / rebar-compatible directory structure
+  with the following top level directories: _src_, _deps_, _ebin_ and _test_.
+
+* Test module file names end with `_test.erl` ending and test case
+  function names should start with `test_`.
+
 * Each test file can implement some or all of the following callbacks:
   * `before_suite` - Invoked once before all cases,
   * `before_test` - Invoked before each case,
@@ -53,6 +55,8 @@ after_suite() ->
 
 ## Available Assertions
 
+### Positive Assertions
+
 * ```?assert(Expression)```
 * ```?assert_equal(Expected, Actual)```
 * ```?assert_match(Expected, Actual)```
@@ -61,7 +65,10 @@ after_suite() ->
 * ```?assert_exit(Pattern, Expression)```
 * ```?assert_throw(Pattern, Expression)```
 
-### Negations
+### Negated Assertions
+
+This is the same list as in the previous section, with `_not` or `_no`
+inserted in the name.
 
 * ```?assert_not(Expression)```
 * ```?assert_not_equal(Unexpected, Actual)```
@@ -73,7 +80,7 @@ after_suite() ->
 
 ## Fixtures
 
-etest has no concept of fixtures like eunit. If you need some
+etest has no concept of fixtures like EUnit. If you need some
 data over and over inside of your tests, you can define macros or
 functions instead and call them from within your tests.
 
@@ -113,7 +120,7 @@ project: [https://vimeo.com/43672318](https://vimeo.com/43672318)
 To install etest add it as a dependency to your rebar.config and also add
 the test directory to the ```src_dirs``` option. This will compile the
 tests whenever ```rebar compile``` is executed and you don't have to compile
-the tests manuall.
+the tests manually.
 
 ### Example rebar.config
 
@@ -148,6 +155,6 @@ Run ```deps/etest/bin/etest-runner test/integration/user_login_test.erl``` to
 execute a single test file.
 
 To pass additional arguments to the `erl` command you can use the
-environmant variable `ERL_AFLAGS`. E.g
+environment variable `ERL_AFLAGS`. For example:
 
-```ERL_AFLAGS="-config priv/config/test.config" deps/etest/bin/etest-runner``` 
+    ERL_AFLAGS="-config priv/config/test.config" deps/etest/bin/etest-runner
