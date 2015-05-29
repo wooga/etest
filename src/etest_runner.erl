@@ -41,8 +41,7 @@ run(Module) ->
     ToRun = lists:flatten([BeforeSuite, FunsWithCallbacks, AfterSuite]),
     TryTest = fun (Test) ->
         try
-            Test(),
-            io:format("Etest passed.\n")
+            Test()
         catch
             _:Error ->
                 io:format("Etest failed.\n"),
