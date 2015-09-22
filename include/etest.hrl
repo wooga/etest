@@ -1,117 +1,137 @@
 -ifndef(ETEST_HRL).
 -define(ETEST_HRL, true).
 
-% The following assertion macros were adapted from the EUnit project:
-% Copyright (C) 2004-2006 Mickaël Rémond, Richard Carlsson
+%% The following assertion macros were adapted from the EUnit project:
+%% Copyright (C) 2004-2006 Mickaël Rémond, Richard Carlsson
 
 -define(assert(Expr),
-((fun () ->
-    case (Expr) of
-    true -> ok;
-    __V  -> erlang:error({assert,
-                [{module,     ?MODULE},
-                 {line,       ?LINE},
-                 {expression, (??Expr)},
-                 {expected,   true},
-                 {value,      __V}] })
-    end
-  end)()) ).
+        ((fun(ExprValue) ->
+                  case ExprValue of
+                      true -> ok;
+                      __V ->
+                          erlang:error(
+                            {assert,
+                             [{module,     ?MODULE},
+                              {line,       ?LINE},
+                              {expression, (??Expr)},
+                              {expected,   true},
+                              {value,      __V}]
+                            })
+                  end
+          end)(Expr))).
 
 
 -define(assert_not(Expr),
-((fun () ->
-    case (Expr) of
-    false -> ok;
-    __V  -> erlang:error({assert,
-                [{module,     ?MODULE},
-                 {line,       ?LINE},
-                 {expression, (??Expr)},
-                 {expected,   false},
-                 {value,      __V}] })
-    end
-  end)()) ).
+        ((fun(ExprValue) ->
+                  case ExprValue of
+                      false -> ok;
+                      __V ->
+                          erlang:error(
+                            {assert,
+                             [{module,     ?MODULE},
+                              {line,       ?LINE},
+                              {expression, (??Expr)},
+                              {expected,   false},
+                              {value,      __V}]
+                            })
+                  end
+          end)(Expr))).
 
 
 -define(assert_equal(Expected, Expr),
-((fun (_ExpectedValue, _ExprValue) ->
-    case (_ExprValue == _ExpectedValue) of
-    true -> ok;
-    false -> erlang:error({assert_equal,
-                [{module,     ?MODULE},
-                 {line,       ?LINE},
-                 {expression, (??Expr)},
-                 {expected,   _ExpectedValue},
-                 {value,      _ExprValue}] })
-    end
-  end)(Expected, Expr)) ).
+        ((fun (_ExpectedValue, _ExprValue) ->
+                  case (_ExprValue == _ExpectedValue) of
+                      true -> ok;
+                      false ->
+                          erlang:error(
+                            {assert_equal,
+                             [{module,     ?MODULE},
+                              {line,       ?LINE},
+                              {expression, (??Expr)},
+                              {expected,   _ExpectedValue},
+                              {value,      _ExprValue}]
+                            })
+                  end
+          end)(Expected, Expr))).
 
 
 -define(assert_not_equal(Unexpected, Expr),
-((fun (__X) ->
-    case (Expr) of
-    __X -> erlang:error({assert_not_equal,
-                [{module,     ?MODULE},
-                 {line,       ?LINE},
-                 {expression, (??Expr)},
-                 {value,      __X}] });
-    _ -> ok
-    end
-  end)(Unexpected)) ).
-
+        ((fun(UnexpectedValue, ExprValue) ->
+                  case ExprValue of
+                      UnexpectedValue ->
+                          erlang:error(
+                            {assert_not_equal,
+                             [{module,     ?MODULE},
+                              {line,       ?LINE},
+                              {expression, (??Expr)},
+                              {value,      UnexpectedValue}]
+                            });
+                      _ -> ok
+                  end
+          end)(Unexpected, Expr))).
 
 
 -define(assert_match(Guard, Expr),
-((fun () ->
-    case (Expr) of
-    Guard -> ok;
-    __V -> erlang:error({assert_match,
-                [{module,     ?MODULE},
-                 {line,       ?LINE},
-                 {expression, (??Expr)},
-                 {pattern,    (??Guard)},
-                 {value,      __V}]})
-    end
-  end)()) ).
+        ((fun(ExprValue) ->
+                  case ExprValue of
+                      Guard -> ok;
+                      __V ->
+                          erlang:error(
+                            {assert_match,
+                             [{module,     ?MODULE},
+                              {line,       ?LINE},
+                              {expression, (??Expr)},
+                              {pattern,    (??Guard)},
+                              {value,      __V}]
+                            })
+                  end
+          end)(Expr))).
 
 
 -define(assert_no_match(Guard, Expr),
-((fun () ->
-    __V = (Expr),
-    case __V of
-    Guard -> erlang:error({assert_not_match,
-                [{module,     ?MODULE},
-                 {line,       ?LINE},
-                 {expression, (??Expr)},
-                 {pattern,    (??Guard)},
-                 {value,      __V}]});
-    _ -> ok
-    end
-  end)()) ).
-
+        ((fun(ExprValue) ->
+                  case ExprValue of
+                      Guard ->
+                          erlang:error(
+                            {assert_not_match,
+                             [{module,     ?MODULE},
+                              {line,       ?LINE},
+                              {expression, (??Expr)},
+                              {pattern,    (??Guard)},
+                              {value,      __V}]
+                            });
+                      _ -> ok
+                  end
+          end)(Expr))).
 
 
 -define(assert_exception(Class, Term, Expr),
-((fun () ->
-    try (Expr) of
-        __V -> erlang:error({assert_exception,
-                    [{module,     ?MODULE},
-                     {line,       ?LINE},
-                     {expression, (??Expr)},
-                     {pattern,
-                        "{" ++ (??Class) ++ ", " ++ (??Term) ++ ", [...]}"},
-                     {unexpected_success, __V}] })
-    catch
-    Class:Term -> ok;
-        __C:__T ->
-        erlang:error({assert_exception,
-            [{module,     ?MODULE},
-             {line,       ?LINE},
-             {expression, (??Expr)},
-             {pattern,    "{" ++ (??Class) ++ ", " ++ (??Term) ++ ", [...]}"},
-             {unexpected_exception,
-                {__C, __T, erlang:get_stacktrace()}}] })
-    end
-  end)()) ).
+        ((fun() ->
+                  try (Expr) of
+                      __V ->
+                          erlang:error(
+                            {assert_exception,
+                             [{module,     ?MODULE},
+                              {line,       ?LINE},
+                              {expression, (??Expr)},
+                              {pattern,
+                               "{" ++ (??Class) ++ ", " ++ (??Term) ++ ", [...]}"},
+                              {unexpected_success, __V}]
+                            })
+                  catch
+                      Class:Term -> ok;
+                      __C:__T ->
+                          erlang:error(
+                            {assert_exception,
+                             [{module,     ?MODULE},
+                              {line,       ?LINE},
+                              {expression, (??Expr)},
+                              {pattern,    "{" ++ (??Class) ++ ", " ++ (??Term) ++ ", [...]}"},
+                              {unexpected_exception,
+                               {__C, __T, erlang:get_stacktrace()}}]
+                            })
+                  end
+          end)())).
 
 
 -define(assert_error(Term, Expr), ?assert_exception(error, Term, Expr)).
@@ -120,29 +140,27 @@
 
 
 -define(assert_no_exception(Class, Term, Expr),
-((fun () ->
-    try (Expr) of
-        _ -> ok
-    catch
-    __C:__T ->
-        case __C of
-        Class ->
-            case __T of
-            Term ->
-                erlang:error({assert_not_exception,
-                    [{module,     ?MODULE},
-                     {line,       ?LINE},
-                     {expression, (??Expr)},
-                     {pattern,
-                        "{" ++ (??Class) ++ ", " ++ (??Term) ++ ", [...]}"},
-                     {unexpected_exception,
-                         {__C, __T, erlang:get_stacktrace()}}] });
-            _ -> ok
-            end;
-        _ -> ok
-        end
-    end
-  end)()) ).
+        ((fun() ->
+                  try (Expr) of
+                      _ -> ok
+                  catch
+                      __C:__T ->
+                          case {__C, __T} of
+                              {Class, Term} ->
+                                  erlang:error(
+                                    {assert_not_exception,
+                                     [{module,     ?MODULE},
+                                      {line,       ?LINE},
+                                      {expression, (??Expr)},
+                                      {pattern,
+                                       "{" ++ (??Class) ++ ", " ++ (??Term) ++ ", [...]}"},
+                                      {unexpected_exception,
+                                       {__C, __T, erlang:get_stacktrace()}}]
+                                    });
+                              _ -> ok
+                          end
+                  end
+          end)())).
 
 
 -define(assert_no_error(Term, Expr), ?assert_no_exception(error, Term, Expr)).
