@@ -7,7 +7,7 @@
 -define(assert(Expr),
         ((fun(ExprValue) ->
                   case ExprValue of
-                      true -> ok;
+                      true -> true;
                       __V ->
                           erlang:error(
                             {assert,
@@ -24,7 +24,7 @@
 -define(assert_not(Expr),
         ((fun(ExprValue) ->
                   case ExprValue of
-                      false -> ok;
+                      false -> true;
                       __V ->
                           erlang:error(
                             {assert,
@@ -41,7 +41,7 @@
 -define(assert_equal(Expected, Expr),
         ((fun (_ExpectedValue, _ExprValue) ->
                   case (_ExprValue == _ExpectedValue) of
-                      true -> ok;
+                      true -> true;
                       false ->
                           erlang:error(
                             {assert_equal,
@@ -66,7 +66,7 @@
                               {expression, (??Expr)},
                               {value,      UnexpectedValue}]
                             });
-                      _ -> ok
+                      _ -> true
                   end
           end)(Unexpected, Expr))).
 
@@ -74,7 +74,7 @@
 -define(assert_match(Guard, Expr),
         ((fun(ExprValue) ->
                   case ExprValue of
-                      Guard -> ok;
+                      Guard -> true;
                       __V ->
                           erlang:error(
                             {assert_match,
@@ -100,7 +100,7 @@
                               {pattern,    (??Guard)},
                               {value,      __V}]
                             });
-                      _ -> ok
+                      _ -> true
                   end
           end)(Expr))).
 
@@ -119,7 +119,7 @@
                               {unexpected_success, __V}]
                             })
                   catch
-                      Class:Term -> ok;
+                      Class:Term -> true;
                       __C:__T ->
                           erlang:error(
                             {assert_exception,
@@ -142,7 +142,7 @@
 -define(assert_no_exception(Class, Term, Expr),
         ((fun() ->
                   try (Expr) of
-                      _ -> ok
+                      _ -> true
                   catch
                       __C:__T ->
                           case {__C, __T} of
@@ -157,7 +157,7 @@
                                       {unexpected_exception,
                                        {__C, __T, erlang:get_stacktrace()}}]
                                     });
-                              _ -> ok
+                              _ -> true
                           end
                   end
           end)())).
