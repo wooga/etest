@@ -33,17 +33,17 @@
 
 
 -define(assert_equal(Expected, Expr),
-((fun (__X) ->
-    case (Expr) of
-    __X -> ok;
-    __V -> erlang:error({assert_equal,
+((fun (_ExpectedValue, _ExprValue) ->
+    case (_ExprValue == _ExpectedValue) of
+    true -> ok;
+    false -> erlang:error({assert_equal,
                 [{module,     ?MODULE},
                  {line,       ?LINE},
                  {expression, (??Expr)},
-                 {expected,   __X},
-                 {value,      __V}] })
+                 {expected,   _ExpectedValue},
+                 {value,      _ExprValue}] })
     end
-  end)(Expected)) ).
+  end)(Expected, Expr)) ).
 
 
 -define(assert_not_equal(Unexpected, Expr),
