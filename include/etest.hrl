@@ -98,7 +98,7 @@
                               {line,       ?LINE},
                               {expression, (??Expr)},
                               {pattern,    (??Guard)},
-                              {value,      __V}]
+                              {value,      ExprValue}]
                             });
                       _ -> true
                   end
