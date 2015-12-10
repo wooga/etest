@@ -22,13 +22,21 @@ run_all(Modules) ->
 
     lists:foreach(fun run/1, Modules),
 
+    Errors = get(errors),
+    SummaryColor = case Errors == 0 of
+        true -> "\x1b[32;1m";
+        false -> "\x1b[31;1m"
+    end,
+    io:format(SummaryColor),
+
     io:format("=========================================~n"
               "  Failed: ~p.  Success: ~p.  Total: ~p.~n~n", [
-                get(errors),
+                Errors,
                 get(success),
                 get(tests) ]),
 
-    erlang:halt(get(errors)).
+    io:format("\x1b[0m"),
+    erlang:halt(Errors).
 
 
 run(Module) ->
@@ -44,11 +52,13 @@ run(Module) ->
             Test()
         catch
             _:Error ->
+                io:format("\x1b[31m"),
                 io:format("Etest failed.\n"),
                 inc(errors),
                 io:format("::~p~n", [Error]),
                 CleanTrace = clean_trace(erlang:get_stacktrace()),
-                io:format("Stacktrace:~n~p~n~n", [CleanTrace])
+                io:format("Stacktrace:~n~p~n~n", [CleanTrace]),
+                io:format("\x1b[0m")
         end
     end,
     lists:foreach(TryTest, ToRun).
@@ -80,12 +90,19 @@ testfuns(Module) ->
     MakeApplicative = fun({FunName, _}) ->
         fun() ->
             inc(tests),
+
             Msg = lists:flatten(io_lib:format("~p:~p ", [Module, FunName])),
-            io:format(
-                string:left(Msg, 80, $.) ++ "\n" ++
-                string:left("",  80, $=) ++ "\n"
-            ),
+            io:format(string:left(Msg, 80, $.) ++ "\n"),
+
+            Before = erlang:monotonic_time(),
             Module:FunName(),
+            After = erlang:monotonic_time(),
+
+            Seconds = erlang:convert_time_unit(After - Before, native, milli_seconds),
+            DurationStr = lists:flatten(io_lib:format(" ~pms", [Seconds])),
+            io:format(string:right(DurationStr, 80, $=)),
+            io:format("~n~n"),
+
             inc(success)
         end
     end,
