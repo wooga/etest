@@ -24,45 +24,75 @@ run_all(Modules) ->
 
     Errors = get(errors),
     SummaryColor = case Errors == 0 of
-        true -> "\x1b[32;1m";
+        true  -> "\x1b[32;1m";
         false -> "\x1b[31;1m"
     end,
-    io:format(SummaryColor),
 
-    io:format("=========================================~n"
-              "  Failed: ~p.  Success: ~p.  Total: ~p.~n~n", [
-                Errors,
-                get(success),
-                get(tests) ]),
+    io:format(
+        "~s"
+        "=========================================~n"
+        "  Failed: ~p.  Success: ~p.  Total: ~p."
+        "\x1b[0m~n",
+        [SummaryColor, Errors, get(success), get(tests)]
+    ),
 
-    io:format("\x1b[0m"),
     erlang:halt(Errors).
 
 
 run(Module) ->
-    Funs = testfuns(Module),
-    FunsWithCallbacks = apply_callbacks(Module, Funs),
-
+    Tests       = apply_callbacks(Module, testfuns(Module)),
     BeforeSuite = maybe_fun(Module, before_suite),
-    AfterSuite = maybe_fun(Module, after_suite),
+    AfterSuite  = maybe_fun(Module, after_suite),
 
-    ToRun = lists:flatten([BeforeSuite, FunsWithCallbacks, AfterSuite]),
-    TryTest = fun (Test) ->
-        try
-            Test()
-        catch
-            _:Error ->
-                io:format("\x1b[31m"),
-                io:format("Etest failed.\n"),
-                inc(errors),
-                io:format("::~p~n", [Error]),
-                CleanTrace = clean_trace(erlang:get_stacktrace()),
-                io:format("Stacktrace:~n~p~n~n", [CleanTrace]),
-                io:format("\x1b[0m")
-        end
+    require_hook(BeforeSuite, "Suite Setup "),
+    lists:foreach(fun run_test/1, Tests),
+    require_hook(AfterSuite, "Suite Teardown "),
+
+    ok.
+
+
+run_test(Test) ->
+    Before = erlang:monotonic_time(),
+
+    try
+        Test()
+    catch
+        _:Error ->
+            inc(errors),
+            format_error("Test ", Error, clean_trace(erlang:get_stacktrace()))
     end,
-    lists:foreach(TryTest, ToRun).
 
+    After  = erlang:monotonic_time(),
+    Millis = erlang:convert_time_unit(After - Before, native, milli_seconds),
+
+    DurationStr = lists:flatten(io_lib:format(" ~pms", [Millis])),
+    io:format(string:right(DurationStr, 80, $=)),
+    io:format("~n~n"),
+    ok.
+
+
+format_error(Prefix, Error, Trace) ->
+    io:format("\x1b[31m"),
+    io:format(
+        "~sError:~n\t~p~nStacktrace:~n\t~p~n",
+        [Prefix, Error, Trace]
+    ),
+    io:format("\x1b[0m"),
+    ok.
+
+
+require_hook(Fun, Name) ->
+    try
+        Before = erlang:monotonic_time(),
+        Fun(),
+        After = erlang:monotonic_time(),
+        erlang:convert_time_unit(After - Before, native, milli_seconds)
+    catch
+        _:Error ->
+            format_error(Name, Error, clean_trace(erlang:get_stacktrace())),
+            io:format("~n"),
+            erlang:halt(1)
+    end.
 
 
 testfuns(Module) ->
@@ -94,14 +124,7 @@ testfuns(Module) ->
             Msg = lists:flatten(io_lib:format("~p:~p ", [Module, FunName])),
             io:format(string:left(Msg, 80, $.) ++ "\n"),
 
-            Before = erlang:monotonic_time(),
             Module:FunName(),
-            After = erlang:monotonic_time(),
-
-            Seconds = erlang:convert_time_unit(After - Before, native, milli_seconds),
-            DurationStr = lists:flatten(io_lib:format(" ~pms", [Seconds])),
-            io:format(string:right(DurationStr, 80, $=)),
-            io:format("~n~n"),
 
             inc(success)
         end
