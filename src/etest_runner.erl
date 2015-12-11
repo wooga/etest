@@ -40,7 +40,7 @@ run_all(Modules) ->
 
 
 run(Module) ->
-    Tests       = apply_callbacks(Module, testfuns(Module)),
+    Tests       = testfuns(Module),
     BeforeSuite = maybe_fun(Module, before_suite),
     AfterSuite  = maybe_fun(Module, after_suite),
 
@@ -117,6 +117,8 @@ testfuns(Module) ->
         FocusTests -> FocusTests
     end,
 
+    Before = maybe_fun(Module, before_test),
+    After = maybe_fun(Module, after_test),
     MakeApplicative = fun({FunName, _}) ->
         fun() ->
             inc(tests),
@@ -124,24 +126,16 @@ testfuns(Module) ->
             Msg = lists:flatten(io_lib:format("~p:~p ", [Module, FunName])),
             io:format(string:left(Msg, 80, $.) ++ "\n"),
 
-            Module:FunName(),
-
-            inc(success)
+            Before(),
+            try
+                Module:FunName(),
+                inc(success)
+            after
+                After()
+            end
         end
     end,
     lists:map(MakeApplicative, TestFuns).
-
-
-apply_callbacks(Module, Funs) ->
-    Before = maybe_fun(Module, before_test),
-    After = maybe_fun(Module, after_test),
-    [
-        fun() ->
-            Before(),
-            try Fun() after After() end
-        end
-        || Fun <- Funs
-    ].
 
 
 maybe_fun(Module, FunName) ->
