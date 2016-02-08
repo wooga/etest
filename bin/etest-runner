@@ -15,4 +15,4 @@ do
 done
 
 # Invoke runner, assuming all files have been compiled to `ebin/`.
-erl -noshell -noinput -pa deps/*/ebin apps/*/ebin deps/elixir/lib/*/ebin ebin -s etest_runner run_all $modules
+erl $ETEST_ARGS -noshell -noinput -pa deps/*/ebin apps/*/ebin deps/elixir/lib/*/ebin ebin -s etest_runner run_all $modules
