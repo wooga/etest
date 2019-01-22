@@ -46,8 +46,7 @@ run_all(Modules) ->
     {result, CoverData, _} = cover:analyse(cover:modules()),
 
     % Accumulate Covered / Not Covered Lines per module
-    CoverDataFun = fun
-        ({{M, _F, _A}, {Covered, NotCovered}}, Acc) ->
+    CoverDataFun = fun({{M, _F, _A}, {Covered, NotCovered}}, Acc) ->
         {OldCovered, OldNotCovered} = maps:get(M, Acc, {0, 0}),
         Acc#{M => { OldCovered + Covered, OldNotCovered + NotCovered }}
     end,
@@ -62,7 +61,8 @@ run_all(Modules) ->
 
     CoverResultPercentage = maps:map(PercentFun, CoverResult),
 
-    io:format("COVER ~p~n", [CoverResultPercentage]),
+    % TODO This needs better formatting
+    io:format("Coverage Report ~p~n", [CoverResultPercentage]),
 
     Errors = get(errors),
     SummaryColor = case Errors == 0 of
