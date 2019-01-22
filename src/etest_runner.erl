@@ -1,5 +1,6 @@
--module (etest_runner).
--compile (export_all).
+-module(etest_runner).
+
+-export([run_all/0, run_all/1]).
 
 
 % Macro printing the given message to stderr.
