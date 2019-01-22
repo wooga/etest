@@ -99,9 +99,9 @@ run_test(Test) ->
     try
         Test()
     catch
-        _:Error ->
+        _:Error:Stacktrace ->
             inc(errors),
-            format_error("Test ", Error, clean_trace(erlang:get_stacktrace()))
+            format_error("Test ", Error, clean_trace(Stacktrace))
     end,
 
     After  = erlang:monotonic_time(),
@@ -130,8 +130,8 @@ require_hook(Fun, Name) ->
         After = erlang:monotonic_time(),
         erlang:convert_time_unit(After - Before, native, milli_seconds)
     catch
-        _:Error ->
-            format_error(Name, Error, clean_trace(erlang:get_stacktrace())),
+        _:Error:Stacktrace ->
+            format_error(Name, Error, clean_trace(Stacktrace)),
             io:format("~n"),
             erlang:halt(1)
     end.
