@@ -20,7 +20,49 @@ run_all(Modules) ->
     % Init statistics.
     [put(K, 0) || K <- [errors, success, tests]],
 
+
+    % start cover tool
+    cover:start(),
+
+    % find all source file names
+    {ok, Path} = file:get_cwd(),
+    Files      = filelib:wildcard(Path ++ "/{src,lib}/*.erl"),
+
+    % Cover compile them which returns the module names
+    MapFun = fun(ModPath) ->
+        {ok, ModName} = cover:compile_module(ModPath, [{erl_opts, [debug_info, nowarn_export_all]}]),
+        ModName
+    end,
+
+    SrcModules = lists:map(MapFun, Files),
+
+    % Run the tests
     lists:foreach(fun run/1, Modules),
+
+    % Analyse the module coverage and write html files
+    cover:analyse_to_file(SrcModules, [html, {outdir, Path ++ "/coverage"}]),
+
+    % Extract the coverage data internally to compute percentages
+    {result, CoverData, _} = cover:analyse(cover:modules()),
+
+    % Accumulate Covered / Not Covered Lines per module
+    CoverDataFun = fun
+        ({{M, _F, _A}, {Covered, NotCovered}}, Acc) ->
+        {OldCovered, OldNotCovered} = maps:get(M, Acc, {0, 0}),
+        Acc#{M => { OldCovered + Covered, OldNotCovered + NotCovered }}
+    end,
+
+    CoverResult = lists:foldl(CoverDataFun, #{}, CoverData),
+
+    % Compute perscentages of covered lines
+    PercentFun = fun(_K, {Covered, NotCovered}) ->
+        Percentage = (Covered / (Covered + NotCovered)) * 100,
+        io_lib:format("~.2f",[Percentage])
+    end,
+
+    CoverResultPercentage = maps:map(PercentFun, CoverResult),
+
+    io:format("COVER ~p~n", [CoverResultPercentage]),
 
     Errors = get(errors),
     SummaryColor = case Errors == 0 of

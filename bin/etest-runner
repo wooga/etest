@@ -6,6 +6,9 @@ if [ $# -eq 0 ]
     else test_files=$@;
 fi
 
+# Create Coverage Folder
+mkdir -p coverage
+
 # Map test files to modules names.
 modules=""
 for file in $test_files
