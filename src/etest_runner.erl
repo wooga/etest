@@ -21,27 +21,23 @@ run_all(Modules) ->
     % Init statistics.
     [put(K, 0) || K <- [errors, success, tests]],
 
-
     % start cover tool
     cover:start(),
 
-    % find all source file names
-    {ok, Path} = file:get_cwd(),
-    Files      = filelib:wildcard(Path ++ "/{src,lib}/*.erl"),
+    % Determine Paths
+    {ok, AppRoot}  = file:get_cwd(),
+    BuildDir       = os:getenv("ETEST_BUILD_DIR"),
+    BeamDir        = filename:join([BuildDir, "ebin"]),
+    CoverDir       = filename:join([AppRoot, "coverage"]),
 
-    % Cover compile them which returns the module names
-    MapFun = fun(ModPath) ->
-        {ok, ModName} = cover:compile_module(ModPath, [{erl_opts, [debug_info, nowarn_export_all]}]),
-        ModName
-    end,
-
-    SrcModules = lists:map(MapFun, Files),
+    CompileResults = cover:compile_beam_directory(BeamDir),
+    SrcModules     = [Module  || {ok, Module} <- CompileResults],
 
     % Run the tests
     lists:foreach(fun run/1, Modules),
 
     % Analyse the module coverage and write html files
-    cover:analyse_to_file(SrcModules, [html, {outdir, Path ++ "/coverage"}]),
+    cover:analyse_to_file(SrcModules, [html, {outdir, CoverDir}]),
 
     % Extract the coverage data internally to compute percentages
     {result, CoverData, _} = cover:analyse(cover:modules()),
