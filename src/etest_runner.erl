@@ -25,22 +25,31 @@ run_all(Modules) ->
     cover:start(),
 
     % Determine Paths
-    {ok, AppRoot}  = file:get_cwd(),
-    BuildDir       = os:getenv("ETEST_BUILD_DIR"),
-    BeamDir        = filename:join([BuildDir, "ebin"]),
-    CoverDir       = filename:join([AppRoot, "coverage"]),
+    {ok, AppRoot}   = file:get_cwd(),
+    BuildDir        = os:getenv("ETEST_BUILD_DIR"),
+    BeamDir         = filename:join([BuildDir, "ebin"]),
+    CoverDir        = filename:join([AppRoot, "coverage"]),
 
-    CompileResults = cover:compile_beam_directory(BeamDir),
-    SrcModules     = [Module  || {ok, Module} <- CompileResults],
+    CompileResults  = cover:compile_beam_directory(BeamDir),
+    SrcModules      = [Module  || {ok, Module} <- CompileResults],
+
+    % Filter Test Modules from Analysis
+    FilterFun = fun(ModName) ->
+        case re:run(erlang:atom_to_list(ModName), "_test$") of
+            {match, _} -> false;
+            nomatch    -> true
+        end
+    end,
+    FilteredModules = lists:filter(FilterFun, SrcModules),
 
     % Run the tests
     lists:foreach(fun run/1, Modules),
 
     % Analyse the module coverage and write html files
-    cover:analyse_to_file(SrcModules, [html, {outdir, CoverDir}]),
+    cover:analyse_to_file(FilteredModules, [html, {outdir, CoverDir}]),
 
     % Extract the coverage data internally to compute percentages
-    {result, CoverData, _} = cover:analyse(cover:modules()),
+    {result, CoverData, _} = cover:analyse(FilteredModules),
 
     % Accumulate Covered / Not Covered Lines per module
     CoverDataFun = fun({{M, _F, _A}, {Covered, NotCovered}}, Acc) ->
