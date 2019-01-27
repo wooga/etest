@@ -67,8 +67,7 @@ run_all(Modules) ->
 
     CoverResultPercentage = maps:map(PercentFun, CoverResult),
 
-    % TODO This needs better formatting
-    io:format("Coverage Report ~p~n", [CoverResultPercentage]),
+    print_coverage_report(CoverResultPercentage),
 
     Errors = get(errors),
     SummaryColor = case Errors == 0 of
@@ -212,3 +211,22 @@ clean_trace(Trace0) ->
 
 inc(Name) ->
     put(Name, get(Name) + 1).
+
+
+print_coverage_report(CoverageData) ->
+    Header = ["+==========================================================+",
+              "| Coverage Report                                          |",
+              "+================================================+=========+",
+              "| Module                                         | Percent |",
+              "+------------------------------------------------+---------+"],
+    io:format("~n~s~n~s~n~s~n~s~n~s~n", Header),
+
+    PrintFun = fun({Module, Percent}) ->
+        StringModule = erlang:atom_to_list(Module),
+        io:format("| ~s | ~s |~n", [string:left(StringModule, 46), string:right(Percent, 7)])
+    end,
+
+    lists:foreach(PrintFun, maps:to_list(CoverageData)),
+
+    Footer = "+==========================================================+",
+    io:format("~s~n~n", [Footer]).
