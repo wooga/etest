@@ -3,6 +3,9 @@
 etest is a lightweight, convention-over-configuration test framework for
 Erlang.
 
+It comes with a companion library for testing http / web apps and APIs which is
+called [etest_http](https://github.com/wooga/etest_http)
+
 * etest expects an Erlang application / rebar3-compatible directory structure
   with the following top level directories: `src`,  and `test`.
 
