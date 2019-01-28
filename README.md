@@ -134,15 +134,11 @@ the tests manually.
 
 % Dependencies
 {deps, [
-    {etest, ".*", {git, "git://github.com/wooga/etest.git"}}
-]}.
-
-% Which files to cleanup when rebar clean is executed.
-{clean_files, ["ebin/*.beam"]}.
+    {etest, "1.2.0"}
+]}
 ```
 
-After updating your rebar.config, run ```rebar get-deps``` to install etest.
-
+After updating your rebar.config, run ```rebar3 get-deps``` to install etest.
 
 ## Running the Tests
 
