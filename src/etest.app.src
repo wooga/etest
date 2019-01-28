@@ -6,5 +6,14 @@
     {registered, []},
     {modules, []},
     {env,[]},
-    {applications, []}
+    {applications, []},
+    {files, [
+        "rebar.config",
+        "LICENSE",
+        "README.md",
+        "bin",
+        "src",
+        "include",
+        "test"
+    ]}
 ]}.
