@@ -3,8 +3,8 @@
 etest is a lightweight, convention-over-configuration test framework for
 Erlang.
 
-* etest expects an Erlang application / rebar-compatible directory structure
-  with the following top level directories: _src_, _deps_, _ebin_ and _test_.
+* etest expects an Erlang application / rebar3-compatible directory structure
+  with the following top level directories: `src`,  and `test`.
 
 * Test module file names end with `_test.erl` ending and test case
   function names should start with `test_`.
@@ -109,7 +109,6 @@ focus_test_foo() ->
     ?assert(true).
 ```
 
-
 ## Demo
 
 There is a quick screencast on vimeo that shows how to use etest in your
@@ -145,16 +144,86 @@ After updating your rebar.config, run ```rebar get-deps``` to install etest.
 ## Running the Tests
 
 Before running the tests, they need to be compiled by running
-```rebar compile```. You can write a simple shell script that compiles
+```rebar3 compile```. You can write a simple shell script that compiles
 everything before running the tests to make your life easier.
 
-In your project directory, run ```deps/etest/bin/etest-runner``` to execute all
-tests in the `test` directory.
+Etest comes with a test runner, which by default, is buried in the _build directory
+```_build/default/lib/etest/bin/etest-runner```
 
-Run ```deps/etest/bin/etest-runner test/integration/user_login_test.erl``` to
-execute a single test file.
+For convenience you can either symlink it to a top level direcory or create a ```make``` task
+
+
+### Run All The Tests
+
+```
+# If you have symlinked it to your app root directory
+./etest-runner
+
+# If you want to run it from the _build dir
+_build/default/lib/etest/bin/etest_runner
+```
+
+### Run a Single Test
+```
+etest-runner test/integration/user_login_test.erl
+```
+
+### Test Coverage Report
+
+If you want to know how much of your codebase is covered by etest tests, you can set two additional enironment variables (ETEST_BUILD_DIR and WITH_COVERAGE. This will create a `coverage` directory in you app root directory in which you will find the html reports.
+
+Run the tests like this where `ETEST_BUILD_DIR` is the build dir of your app so etest knows which modules to cover and with `WITH_COVERAGE=true` to tell it to generate the report.
+
+```
+rebar3 compile && \
+	ETEST_ARGS="-config config/test.config" \
+	WITH_COVERAGE=yes \
+	ETEST_BUILD_DIR="_build/default/lib/[YOUR_APP_NAME]" \
+	_build/default/lib/etest/bin/etest-runner
+```
+
+This will run the tests, save the report html files in ./coverage and create some ascii output like this
+
+```
++==========================================================+
+| Coverage Report                                          |
++================================================+=========+
+| Module                                         | Percent |
++------------------------------------------------+---------+
+| myapp_app                                      |  100.00 |
+| myapp_config                                   |   91.67 |
+| myapp_default_handler                          |   84.21 |
+| myapp_session                                  |   85.19 |
+| myapp_session_handler                          |   90.32 |
+| myapp_session_middleware                       |   54.55 |
+| myapp_session_store                            |   69.05 |
+| myapp_sql                                      |   75.00 |
+| myapp_sql_worker                               |   70.59 |
+| myapp_sup                                      |  100.00 |
+| myapp_user                                     |   80.00 |
+| myapp_users_handler                            |  100.00 |
+| myapp_utils                                    |   87.50 |
+| myapp_view                                     |   96.15 |
++================================================+=========+
+
+=========================================
+  Failed: 0.  Success: 25.  Total: 25.
+```
+
+### Passing Arguments to erl
 
 To pass additional arguments to the `erl` command you can use the
-environment variable `ERL_AFLAGS`. For example:
+environment variable `ETEST_ARGS`. For example:
 
-    ERL_AFLAGS="-config priv/config/test.config" deps/etest/bin/etest-runner
+```
+ETEST_ARGS="-config config/test.config" deps/etest/bin/etest-runner
+```
+
+### Makefile Example
+
+For absolute convenience here is an example Makefile task which will run all tests with coverage report for the ```myapp``` app
+
+```
+test:
+	rebar3 compile && ETEST_ARGS="-config config/test.config" WITH_COVERAGE=yes ETEST_BUILD_DIR="_build/default/lib/myapp" _build/default/lib/etest/bin/etest-runner
+```

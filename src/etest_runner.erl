@@ -1,6 +1,6 @@
 -module(etest_runner).
 
--export([run_all/0, run_all/1]).
+-export([init/1, run_all/0, run_all/1]).
 
 
 % Macro printing the given message to stderr.
@@ -10,6 +10,30 @@
 -define (stderr (Msg), ?stderr(Msg, [])).
 
 
+init(Modules) ->
+     % Check if coverage report should be generated
+    WithCoverage = os:getenv("WITH_COVER"),
+
+
+    case WithCoverage of
+        false ->
+            % Run the tests
+            run_all(Modules),
+            print_error_report();
+        _ ->
+            % Start Cover Tool and figure out app modules to cover
+            AppModules = initialize_cover_tool(),
+
+            % Run the tests
+            run_all(Modules),
+
+            CoverageResults = analyse_coverage(AppModules),
+
+            print_coverage_report(CoverageResults),
+            print_error_report()
+    end.
+
+
 % The runner will be called without arguments in case no tests were found .
 % Print a descriptive error message, then exit.
 run_all() ->
@@ -17,73 +41,13 @@ run_all() ->
     erlang:halt().
 
 
+
 run_all(Modules) ->
     % Init statistics.
     [put(K, 0) || K <- [errors, success, tests]],
 
-    % start cover tool
-    cover:start(),
-
-    % Determine Paths
-    {ok, AppRoot}   = file:get_cwd(),
-    BuildDir        = os:getenv("ETEST_BUILD_DIR"),
-    BeamDir         = filename:join([BuildDir, "ebin"]),
-    CoverDir        = filename:join([AppRoot, "coverage"]),
-
-    CompileResults  = cover:compile_beam_directory(BeamDir),
-    SrcModules      = [Module  || {ok, Module} <- CompileResults],
-
-    % Filter Test Modules from Analysis
-    FilterFun = fun(ModName) ->
-        case re:run(erlang:atom_to_list(ModName), "_test$") of
-            {match, _} -> false;
-            nomatch    -> true
-        end
-    end,
-    FilteredModules = lists:filter(FilterFun, SrcModules),
-
     % Run the tests
-    lists:foreach(fun run/1, Modules),
-
-    % Analyse the module coverage and write html files
-    cover:analyse_to_file(FilteredModules, [html, {outdir, CoverDir}]),
-
-    % Extract the coverage data internally to compute percentages
-    {result, CoverData, _} = cover:analyse(FilteredModules),
-
-    % Accumulate Covered / Not Covered Lines per module
-    CoverDataFun = fun({{M, _F, _A}, {Covered, NotCovered}}, Acc) ->
-        {OldCovered, OldNotCovered} = maps:get(M, Acc, {0, 0}),
-        Acc#{M => { OldCovered + Covered, OldNotCovered + NotCovered }}
-    end,
-
-    CoverResult = lists:foldl(CoverDataFun, #{}, CoverData),
-
-    % Compute perscentages of covered lines
-    PercentFun = fun(_K, {Covered, NotCovered}) ->
-        Percentage = (Covered / (Covered + NotCovered)) * 100,
-        io_lib:format("~.2f",[Percentage])
-    end,
-
-    CoverResultPercentage = maps:map(PercentFun, CoverResult),
-
-    print_coverage_report(CoverResultPercentage),
-
-    Errors = get(errors),
-    SummaryColor = case Errors == 0 of
-        true  -> "\x1b[32;1m";
-        false -> "\x1b[31;1m"
-    end,
-
-    io:format(
-        "~s"
-        "=========================================~n"
-        "  Failed: ~p.  Success: ~p.  Total: ~p."
-        "\x1b[0m~n",
-        [SummaryColor, Errors, get(success), get(tests)]
-    ),
-
-    erlang:halt(Errors).
+    lists:foreach(fun run/1, Modules).
 
 
 run(Module) ->
@@ -211,6 +175,72 @@ clean_trace(Trace0) ->
 
 inc(Name) ->
     put(Name, get(Name) + 1).
+
+initialize_cover_tool() ->
+    % start cover tool
+    cover:start(),
+
+    % Determine Paths
+    BuildDir        = os:getenv("ETEST_BUILD_DIR"),
+    BeamDir         = filename:join([BuildDir, "ebin"]),
+
+    CompileResults  = cover:compile_beam_directory(BeamDir),
+    SrcModules      = [Module  || {ok, Module} <- CompileResults],
+
+    % Filter Test Modules from Analysis so only the app modules remain
+    FilterFun = fun(ModName) ->
+        case re:run(erlang:atom_to_list(ModName), "_test$") of
+            {match, _} -> false;
+            nomatch    -> true
+        end
+    end,
+    lists:filter(FilterFun, SrcModules).
+
+
+analyse_coverage(AppModules) ->
+    % Determine Paths
+    {ok, AppRoot}   = file:get_cwd(),
+    CoverDir        = filename:join([AppRoot, "coverage"]),
+
+    % Analyse the module coverage and write html files
+    cover:analyse_to_file(AppModules, [html, {outdir, CoverDir}]),
+
+    % Extract the coverage data internally to compute percentages
+    {result, CoverData, _} = cover:analyse(AppModules),
+
+    % Accumulate Covered / Not Covered Lines per module
+    CoverDataFun = fun({{M, _F, _A}, {Covered, NotCovered}}, Acc) ->
+        {OldCovered, OldNotCovered} = maps:get(M, Acc, {0, 0}),
+        Acc#{M => { OldCovered + Covered, OldNotCovered + NotCovered }}
+    end,
+
+    CoverResult = lists:foldl(CoverDataFun, #{}, CoverData),
+
+    % Compute percentages of covered lines
+    PercentFun = fun(_K, {Covered, NotCovered}) ->
+        Percentage = (Covered / (Covered + NotCovered)) * 100,
+        io_lib:format("~.2f",[Percentage])
+    end,
+
+    maps:map(PercentFun, CoverResult).
+
+
+print_error_report() ->
+    Errors = get(errors),
+    SummaryColor = case Errors == 0 of
+        true  -> "\x1b[32;1m";
+        false -> "\x1b[31;1m"
+    end,
+
+    io:format(
+        "~s"
+        "=========================================~n"
+        "  Failed: ~p.  Success: ~p.  Total: ~p."
+        "\x1b[0m~n",
+        [SummaryColor, Errors, get(success), get(tests)]
+    ),
+
+    erlang:halt(Errors).
 
 
 print_coverage_report(CoverageData) ->
