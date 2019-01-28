@@ -120,7 +120,7 @@
                             })
                   catch
                       Class:Term -> true;
-                      __C:__T ->
+                      __C:__T:__S ->
                           erlang:error(
                             {assert_exception,
                              [{module,     ?MODULE},
@@ -128,7 +128,7 @@
                               {expression, (??Expr)},
                               {pattern,    "{" ++ (??Class) ++ ", " ++ (??Term) ++ ", [...]}"},
                               {unexpected_exception,
-                               {__C, __T, erlang:get_stacktrace()}}]
+                               {__C, __T, __S}}]
                             })
                   end
           end)())).
@@ -144,7 +144,7 @@
                   try (Expr) of
                       _ -> true
                   catch
-                      __C:__T ->
+                      __C:__T:__S ->
                           case {__C, __T} of
                               {Class, Term} ->
                                   erlang:error(
@@ -155,7 +155,7 @@
                                       {pattern,
                                        "{" ++ (??Class) ++ ", " ++ (??Term) ++ ", [...]}"},
                                       {unexpected_exception,
-                                       {__C, __T, erlang:get_stacktrace()}}]
+                                       {__C, __T, __S}}]
                                     });
                               _ -> true
                           end

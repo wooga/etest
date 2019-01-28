@@ -6,6 +6,12 @@ if [ $# -eq 0 ]
     else test_files=$@;
 fi
 
+if [[ ! -z $WITH_COVERAGE ]]
+then
+    # Create Coverage Folder
+    mkdir -p coverage
+fi
+
 # Map test files to modules names.
 modules=""
 for file in $test_files
@@ -15,4 +21,4 @@ do
 done
 
 # Invoke runner, assuming all files have been compiled to `ebin/`.
-erl $ETEST_ARGS -noshell -noinput -pa _build/default/lib/*/ebin -s etest_runner run_all $modules
+erl $ETEST_ARGS -noshell -noinput -pa _build/default/lib/*/ebin -s etest_runner init $modules
