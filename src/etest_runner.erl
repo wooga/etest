@@ -14,7 +14,6 @@ init(Modules) ->
      % Check if coverage report should be generated
     WithCoverage = os:getenv("WITH_COVERAGE"),
 
-
     case WithCoverage of
         false ->
             % Run the tests
