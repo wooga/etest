@@ -1,6 +1,6 @@
 {application, etest, [
     {description, "A lightweight and fast testing framework for Erlang"},
-    {vsn, "1.2.0"},
+    {vsn, "1.2.1"},
     {links, [{"Github", "https://github.com/wooga/etest"}]},
     {licenses, ["BSD-2-Clause"]},
     {registered, []},
