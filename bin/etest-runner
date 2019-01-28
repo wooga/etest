@@ -21,4 +21,4 @@ do
 done
 
 # Invoke runner, assuming all files have been compiled to `ebin/`.
-erl $ETEST_ARGS -noshell -noinput -pa _build/default/lib/*/ebin -s etest_runner run_all $modules
+erl $ETEST_ARGS -noshell -noinput -pa _build/default/lib/*/ebin -s etest_runner init $modules
