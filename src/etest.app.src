@@ -1,10 +1,10 @@
 {application, etest, [
     {description, "A lightweight and fast testing framework for Erlang"},
     {vsn, "1.2.0"},
-    {maintainers, ["John-Paul Bader"]},
     {links, [{"Github", "https://github.com/wooga/etest"}]},
     {licenses, ["BSD-2-Clause"]},
     {registered, []},
     {modules, []},
+    {env,[]},
     {applications, []}
 ]}.
