@@ -6,8 +6,11 @@ if [ $# -eq 0 ]
     else test_files=$@;
 fi
 
-# Create Coverage Folder
-mkdir -p coverage
+if [[ ! -z $WITH_COVERAGE ]]
+then
+    # Create Coverage Folder
+    mkdir -p coverage
+fi
 
 # Map test files to modules names.
 modules=""
