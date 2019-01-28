@@ -12,7 +12,7 @@
 
 init(Modules) ->
      % Check if coverage report should be generated
-    WithCoverage = os:getenv("WITH_COVER"),
+    WithCoverage = os:getenv("WITH_COVERAGE"),
 
 
     case WithCoverage of
